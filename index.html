@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bronchiectasis Severity Index Calculator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: rgb(82, 151, 191);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bronchiectasis Severity Index Calculator</h1>
+        <form id="bsi-form">
+            <!-- Age Criterion -->
+            <div class="form-group">
+                <label for="age">Age</label>
+                <select id="age" name="age">
+                    <option value="0">&lt; 50</option>
+                    <option value="2">50-69</option>
+                    <option value="4">70-79</option>
+                    <option value="6">80+</option>
+                </select>
+            </div>
+            <!-- BMI Criterion -->
+            <div class="form-group">
+                <label for="bmi">BMI kg/m²</label>
+                <select id="bmi" name="bmi">
+                    <option value="0">&gt;= 18.5</option>
+                    <option value="2">&lt; 18.5</option>
+                </select>
+            </div>
+            <!-- FEV1 % Predicted Criterion -->
+            <div class="form-group">
+                <label for="fev1">FEV1 % Predicted</label>
+                <select id="fev1" name="fev1">
+                    <option value="0">&gt; 80%</option>
+                    <option value="1">50-80%</option>
+                    <option value="2">30-49%</option>
+                    <option value="3">&lt; 30%</option>
+                </select>
+            </div>
+            <!-- Hospital Admissions Criterion -->
+            <div class="form-group">
+                <label for="hospital-admissions">Hospital Admissions in the Past 2 Years</label>
+                <select id="hospital-admissions" name="hospital-admissions">
+                    <option value="0">No</option>
+                    <option value="5">Yes</option>
+                </select>
+            </div>
+            <!-- Exacerbation Frequency Criterion -->
+            <div class="form-group">
+                <label for="exacerbations">Exacerbation Frequency in Last 12 Months</label>
+                <select id="exacerbations" name="exacerbations">
+                    <option value="0">0-2</option>
+                    <option value="2">3 or more</option>
+                </select>
+            </div>
+            <!-- MRC Dyspnoea Score Criterion -->
+            <div class="form-group">
+                <label for="dyspnoea">MRC Dyspnoea Score</label>
+                <select id="dyspnoea" name="dyspnoea">
+                    <option value="0">1-3</option>
+                    <option value="2">4</option>
+                    <option value="3">5</option>
+                </select>
+            </div>
+            <!-- Colonisation Status Criterion -->
+            <div class="form-group">
+                <label for="colonisation">Colonisation Status</label>
+                <select id="colonisation" name="colonisation">
+                    <option value="0">Not colonised</option>
+                    <option value="1">Chronic colonisation</option>
+                    <option value="3">P. aeruginosa colonisation</option>
+                </select>
+            </div>
+            <!-- Radiological Severity Criterion -->
+            <div class="form-group">
+                <label for="radiological-severity">Radiological Severity</label>
+                <select id="radiological-severity" name="radiological-severity">
+                    <option value="0">&lt; 3 lobes involved</option>
+                    <option value="1">3 or more lobes or cystic changes</option>
+                </select>
+            </div>
+            <button type="button" onclick="calculateBSI()">Calculate</button>
+        </form>
+        <div id="results" class="results">
+            <h2>Results</h2>
+            <p id="final-score"></p>
+            <p id="mortality-rate-1year"></p>
+            <p id="hospitalisation-rate-1year"></p>
+            <p id="mortality-rate-4year"></p>
+            <p id="hospitalisation-rate-4year"></p>
+        </div>
+    </div>
+    <script>
+        function calculateBSI() {
+            const form = document.getElementById('bsi-form');
+            let score = 0;
+
+            // Parse form values
+            const age = parseInt(form.age.value);
+            const bmi = parseInt(form.bmi.value);
+            const fev1 = parseInt(form.fev1.value);
+            const hospitalAdmissions = parseInt(form['hospital-admissions'].value);
+            const exacerbations = parseInt(form.exacerbations.value);
+            const dyspnoea = parseInt(form.dyspnoea.value);
+            const colonisation = parseInt(form.colonisation.value);
+            const radiologicalSeverity = parseInt(form['radiological-severity'].value);
+
+            // Calculate total score
+            score += age + bmi + fev1 + hospitalAdmissions + exacerbations + dyspnoea + colonisation + radiologicalSeverity;
+
+            // Determine rates based on score
+            let severity = '';
+            let mortalityRate1Year = '';
+            let hospitalisationRate1Year = '';
+            let mortalityRate4Year = '';
+            let hospitalisationRate4Year = '';
+
+            if (score <= 4) {
+                severity = 'Mild Bronchiectasis';
+                mortalityRate1Year = '0 - 2.8%';
+                hospitalisationRate1Year = '0 - 3.4%';
+                mortalityRate4Year = '0 - 5.3%';
+                hospitalisationRate4Year = '0 - 9.2%';
+            } else if (score <= 8) {
+                severity = 'Moderate Bronchiectasis';
+                mortalityRate1Year = '0.8 - 4.8%';
+                hospitalisationRate1Year = '1.0 - 7.2%';
+                mortalityRate4Year = '4% - 11.3%';
+                hospitalisationRate4Year = '9.9 - 19.4%';
+            } else {
+                severity = 'Severe Bronchiectasis';
+                mortalityRate1Year = '7.6% - 10.5%';
+                hospitalisationRate1Year = '16.7% - 52.6%';
+                mortalityRate4Year = '9.9% - 29.2%';
+                hospitalisationRate4Year = '41.2% - 80.4%';
+            }
+
+            // Display results
+            document.getElementById('final-score').innerText = `Final Score: ${score}`;
+            document.getElementById('mortality-rate-1year').innerText = `1-Year Mortality Rate: ${mortalityRate1Year}`;
+            document.getElementById('hospitalisation-rate-1year').innerText = `1-Year Hospitalisation Rate: ${hospitalisationRate1Year}`;
+            document.getElementById('mortality-rate-4year').innerText = `4-Year Mortality Rate: ${mortalityRate4Year}`;
+            document.getElementById('hospitalisation-rate-4year').innerText = `4-Year Hospitalisation Rate: ${hospitalisationRate4Year}`;
+        }
+    </script>
+</body>
+</html>
